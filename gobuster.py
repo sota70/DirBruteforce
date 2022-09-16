@@ -1,4 +1,5 @@
 import requests
+import sys
 
 
 '''
@@ -48,5 +49,21 @@ def find_hidden_directories(url: str, wordlist_path: str) -> list[str]:
         predicted_urls
     ))
 
+def get_options(args: list[str], tags: list[str]) -> dict[str, str]:
+    input_tags: list[str] = list(filter(
+        lambda tag: args.__contains__(tag),
+        tags
+    ))
+    options: dict[str, str] = {}
+    for tag in input_tags:
+        # タグの後にそのタグに対応した値が必ず入るためindexに+1をしている
+        options[tag] = args[args.index(tag) + 1]
+    return options
+
 if __name__ == "__main__":
-    print(find_hidden_directories("https://www.google.com/", "resource/wordlist.txt"))
+    tags: list[str] = ["-u", "-w"]
+    # sys.argvの一番目の値を消してるのは、一番目はコマンド名にあたるから
+    options: dict[str, str] = get_options(sys.argv[1:], tags)
+    url: str = options["-u"]
+    wordlist_path: str = options["-w"]
+    print(find_hidden_directories(url, wordlist_path))
